@@ -21,6 +21,7 @@
 
 المخرجات:
   assets/fonts/qcf2/p001.ttf … p604.ttf, bsml.ttf
+  assets/fonts/ui/Cairo.ttf, ArefRuqaa-Bold.ttf
   assets/quran/pages.json         صفحات المصحف سطرًا بسطر
   assets/quran/meta.json          السور والأجزاء والأحزاب
   assets/quran/mutashabihat.json  مجموعات المتشابه وكلمات الاختلاف
@@ -48,8 +49,12 @@ SOURCES = {
     # خطوط مجمع الملك فهد الأصلية QCF V2 (خط لكل صفحة + خط البسملة)
     "fonts": ("https://github.com/nuqayah/qpc-fonts",
               "8a4f39d563ea69c994416a1692827e38156c548d"),
+    # خطوط الواجهة (رخصة OFL): Cairo والرقعة
+    "ui": ("https://github.com/google/fonts",
+           "cc39c4c2c304bc368c9b7c311ea2bcc6013299fe"),
 }
-SPARSE = {"layout": ["mushaf/QPC2/", "src/data/"], "fonts": ["mushaf-v2/"]}
+SPARSE = {"layout": ["mushaf/QPC2/", "src/data/"], "fonts": ["mushaf-v2/"],
+          "ui": ["ofl/cairo/", "ofl/arefruqaa/"]}
 
 TOTAL_PAGES = 604
 TOTAL_AYAHS = 6236
@@ -142,6 +147,15 @@ def build_fonts(fonts: Path) -> None:
         shutil.copyfile(ttf, out / f"p{p:03d}.ttf")
     shutil.copyfile(src / "QCF2BSML.ttf", out / "bsml.ttf")
     log(f"✓ الخطوط: {TOTAL_PAGES} خط صفحة + خط البسملة")
+
+
+def build_ui_fonts(ui: Path) -> None:
+    out = ASSETS / "fonts" / "ui"
+    out.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ui / "ofl" / "cairo" / "Cairo[slnt,wght].ttf", out / "Cairo.ttf")
+    shutil.copyfile(ui / "ofl" / "arefruqaa" / "ArefRuqaa-Bold.ttf",
+                    out / "ArefRuqaa-Bold.ttf")
+    log("✓ خطوط الواجهة: Cairo والرقعة")
 
 
 def check_glyphs(pages) -> None:
@@ -331,7 +345,9 @@ def main() -> None:
     layout = fetch("layout")
     muts_dir = fetch("muts")
     fonts = fetch("fonts")
+    ui = fetch("ui")
     build_fonts(fonts)
+    build_ui_fonts(ui)
     pages, ayah_words, ayah_page, surah_names = build_pages(layout)
     validate_pages(pages, ayah_words, ayah_page)
     check_glyphs(pages)

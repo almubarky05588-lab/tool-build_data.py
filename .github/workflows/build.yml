@@ -1,0 +1,55 @@
+name: بناء التطبيق
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: تجهيز بيانات المصحف والمتشابهات
+        run: |
+          pip install fonttools
+          python3 tool/build_data.py
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: إنشاء مجلدات المنصات (android/ios)
+        run: |
+          flutter create . --platforms=android,ios --org sa.albayan --project-name albayan
+          # اسم التطبيق الظاهر على الجهاز
+          sed -i 's/android:label="albayan"/android:label="البيان"/' android/app/src/main/AndroidManifest.xml
+
+      - name: تحليل الكود
+        run: |
+          flutter pub get
+          flutter analyze --no-fatal-infos
+
+      - name: الاختبارات
+        run: flutter test
+
+      - name: بناء APK
+        run: flutter build apk --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: albayan-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14

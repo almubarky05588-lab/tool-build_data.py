@@ -7,6 +7,7 @@ import '../state/app_state.dart';
 import 'index_screen.dart';
 import 'mushaf/mutashabih_sheet.dart';
 import 'widgets/logo.dart';
+import 'widgets/ornament.dart';
 
 /// الشاشة الرئيسية: متابعة القراءة، اختصارات، ومتشابهات آخر صفحة.
 class HomeScreen extends StatelessWidget {
@@ -21,7 +22,25 @@ class HomeScreen extends StatelessWidget {
     final surah = repo.surahForPage(last);
     final groups = repo.groupsOnPage(last);
 
-    return SafeArea(
+    final orn = c.gold.withValues(alpha: state.dark ? 0.16 : 0.24);
+    return Stack(
+      children: [
+        // زخرفة ثابتة أعلى الشاشة وأسفلها
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          height: 300,
+          child: OrnamentFill(color: orn, fade: 1),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 180,
+          child: OrnamentFill(color: orn, fade: -1),
+        ),
+        SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 24),
         children: [
@@ -53,7 +72,7 @@ class HomeScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(26),
             onTap: () => state.openPage(last),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(26),
                 gradient: const LinearGradient(
@@ -62,7 +81,14 @@ class HomeScreen extends StatelessWidget {
                   colors: [Color(0xFF13604E), Color(0xFF0A3329)],
                 ),
               ),
-              child: Column(
+              child: Stack(
+                children: [
+                  const Positioned.fill(
+                    child: OrnamentFill(color: Color(0x29D9B66A), fade: -1),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
@@ -128,6 +154,9 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -167,7 +196,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
+          OrnamentDivider(color: c.gold.withValues(alpha: 0.8)),
+          const SizedBox(height: 4),
 
           // ------------------------------------------------ متشابهات آخر صفحة
           Row(
@@ -191,6 +222,8 @@ class HomeScreen extends StatelessWidget {
           for (final id in groups.take(4)) _GroupRow(groupId: id, page: last),
         ],
       ),
+        ),
+      ],
     );
   }
 }

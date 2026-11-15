@@ -42,8 +42,15 @@ jobs:
           flutter pub get
           flutter analyze --no-fatal-infos
 
-      - name: الاختبارات
+      - name: الاختبارات ورسم صفحات للتحقق البصري
         run: flutter test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: page-screens
+          path: build/screens/
+          retention-days: 14
 
       - name: بناء APK
         run: flutter build apk --release

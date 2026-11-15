@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -51,6 +54,18 @@ jobs:
           name: page-screens
           path: build/screens/
           retention-days: 14
+
+      - name: نشر صور الصفحات في فرع screens للمراجعة
+        if: always()
+        run: |
+          [ -d build/screens ] || exit 0
+          cd build/screens
+          git init -q -b screens
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "صور الصفحات ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" screens
 
       - name: بناء APK
         run: flutter build apk --release

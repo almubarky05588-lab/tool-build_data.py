@@ -86,9 +86,12 @@ RUB_STARTS = [
     (72,1),(73,20),(75,1),(76,19),(78,1),(80,1),(82,1),(84,1),(87,1),(90,1),(94,1),(100,9),
 ]
 
-ARABIC_DIGITS = re.compile(r"[٠-٩]+")
+ARABIC_DIGITS = re.compile("[%s-%s]+" % (chr(0x0660), chr(0x0669)))
 # تشكيل وعلامات وقف وحروف صغيرة وتطويل — تُحذف عند مقارنة الكلمات فقط.
-MARKS = re.compile(r"[ؐ-ًؚ-ٰٟۖ-ۭـ࣓-ࣿ]")
+_MARK_RANGES = [(0x0610, 0x061A), (0x064B, 0x065F), (0x0670, 0x0670),
+                (0x06D6, 0x06ED), (0x0640, 0x0640), (0x08D3, 0x08FF)]
+MARKS = re.compile("[" + "".join("%s-%s" % (chr(a), chr(b))
+                                 for a, b in _MARK_RANGES) + "]")
 
 
 def log(msg: str) -> None:

@@ -1,0 +1,40 @@
+name: albayan
+description: البيان — مصحف المتشابهات. مصحف المدينة كاملًا مع إبراز مواضع التشابه والتنقل بينها.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # حفظ آخر صفحة والإعدادات والعلامات على الجهاز
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # تُولَّد هذه الملفات بالسكربت: python3 tool/build_data.py
+  # خطوط صفحات المصحف (604 خطًا) تُحمَّل عند فتح الصفحة عبر FontLoader،
+  # لذلك تُدرج كملفات أصول وليست كعائلات خطوط ثابتة.
+  assets:
+    - assets/quran/
+    - assets/fonts/qcf2/
+
+  # خطوط الواجهة (رخصة OFL) — يجلبها السكربت نفسه من google/fonts
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/ui/Cairo.ttf
+    - family: ArefRuqaa
+      fonts:
+        - asset: assets/fonts/ui/ArefRuqaa-Bold.ttf
+          weight: 700

@@ -36,9 +36,11 @@ jobs:
 
       - name: إنشاء مجلدات المنصات (android/ios)
         run: |
-          flutter create . --platforms=android,ios --org sa.albayan --project-name albayan
+          flutter create . --platforms=android,ios --org sa.almubarky --project-name albayan
           # اسم التطبيق الظاهر على الجهاز
           sed -i 's/android:label="albayan"/android:label="البيان"/' android/app/src/main/AndroidManifest.xml
+          pip install pillow
+          python3 tool/apply_icons.py android
 
       - name: تحليل الكود
         run: |

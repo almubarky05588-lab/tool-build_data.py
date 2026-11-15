@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/arabic.dart';
 import '../../core/theme.dart';
 import '../widgets/ornament.dart';
+import 'curl_view.dart';
 import '../../data/models.dart';
 import '../../data/page_fonts.dart';
 import '../../data/quran_repository.dart';
@@ -22,7 +23,7 @@ class MushafScreen extends StatefulWidget {
 }
 
 class _MushafScreenState extends State<MushafScreen> {
-  PageController? _controller;
+  CurlController? _controller;
   int _handledJump = -1;
   Timer? _focusTimer;
 
@@ -30,14 +31,14 @@ class _MushafScreenState extends State<MushafScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final state = AppScope.of(context);
-    _controller ??= PageController(initialPage: state.lastPage - 1);
+    _controller ??= CurlController(initialPage: state.lastPage - 1);
     if (state.jumpRequest != _handledJump) {
       _handledJump = state.jumpRequest;
       final target = state.jumpTarget - 1;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ctrl = _controller;
-        if (ctrl != null && ctrl.hasClients && ctrl.page?.round() != target) {
-          ctrl.jumpToPage(target);
+        if (ctrl != null && ctrl.page != target) {
+          ctrl.jumpTo(target);
         }
       });
       if (state.focusAyah != null) {
@@ -183,10 +184,11 @@ class _MushafScreenState extends State<MushafScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  PageView.builder(
-                    controller: _controller,
+                  CurlPageView(
+                    controller: _controller!,
                     itemCount: QuranRepository.totalPages,
                     onPageChanged: _onPageChanged,
+                    background: c.bg,
                     itemBuilder: (context, index) => _PageFrame(
                       pageNo: index + 1,
                       onWordTap: (w) => _openWord(w, index + 1),
@@ -362,14 +364,18 @@ class _ModeToggle extends StatelessWidget {
 
 class _Pager extends StatelessWidget {
   final int page;
-  final PageController? controller;
+  final CurlController? controller;
   const _Pager({required this.page, required this.controller});
 
   void _go(int target) {
     final ctrl = controller;
     if (ctrl == null || target < 1 || target > 604) return;
-    ctrl.animateToPage(target - 1,
-        duration: const Duration(milliseconds: 280), curve: Curves.easeOut);
+    final diff = target - 1 - ctrl.page;
+    if (diff.abs() == 1) {
+      ctrl.turn(diff);
+    } else {
+      ctrl.jumpTo(target - 1);
+    }
   }
 
   @override

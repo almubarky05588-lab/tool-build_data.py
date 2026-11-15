@@ -290,13 +290,27 @@ def build_mutashabihat(muts_dir: Path, ayah_words):
         return [(s, a, i, norm) for (s, a) in m for (i, norm) in ayah_words[(s, a)]]
 
     def diff(x, y):
+        """كلمات الاختلاف بين عضوين، محصورة في منطقة التشابه.
+
+        نحدد منطقة التشابه في كل آية بالمقاطع المتطابقة (كلمتان فأكثر)،
+        ونأخذ كلمات الاختلاف داخلها مع كلمة واحدة قبلها وبعدها (موضع الافتراق).
+        ما خارج المنطقة نص مختلف أصلًا فلا يُلوَّن، حتى لا تتلوّن الآية كلها.
+        """
         sm = difflib.SequenceMatcher(None, [w[3] for w in x], [w[3] for w in y],
                                      autojunk=False)
+        blocks = [b for b in sm.get_matching_blocks() if b.size >= 2] or \
+                 [b for b in sm.get_matching_blocks() if b.size >= 1]
+        if not blocks:
+            return set(), set()
+        ax0 = max(blocks[0].a - 1, 0)
+        ax1 = min(blocks[-1].a + blocks[-1].size + 1, len(x))
+        by0 = max(blocks[0].b - 1, 0)
+        by1 = min(blocks[-1].b + blocks[-1].size + 1, len(y))
         dx, dy = set(), set()
         for op, i1, i2, j1, j2 in sm.get_opcodes():
             if op != "equal":
-                dx.update(range(i1, i2))
-                dy.update(range(j1, j2))
+                dx.update(i for i in range(i1, i2) if ax0 <= i < ax1)
+                dy.update(j for j in range(j1, j2) if by0 <= j < by1)
         return dx, dy
 
     groups, by_ayah = [], {}

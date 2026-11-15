@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
+import 'widgets/ornament.dart';
 import '../state/app_state.dart';
 
 /// إعدادات العرض.
@@ -61,7 +62,19 @@ class SettingsScreen extends StatelessWidget {
       );
     }
 
-    return SafeArea(
+    return Stack(
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          height: 200,
+          child: OrnamentFill(
+            color: AppColorsScope.of(context).gold.withValues(alpha: 0.2),
+            fade: 1,
+          ),
+        ),
+        SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
         children: [
@@ -113,6 +126,8 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+        ),
+      ],
     );
   }
 }

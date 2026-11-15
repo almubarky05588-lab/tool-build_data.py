@@ -32,7 +32,7 @@ class _AlBayanAppState extends State<AlBayanApp> {
       QuranRepository.load(),
       PageFonts.ensureBasmala(),
       // إبقاء شاشة البداية لحظة قصيرة على الأقل
-      Future<void>.delayed(const Duration(milliseconds: 900)),
+      Future<void>.delayed(const Duration(milliseconds: 2600)),
     ]);
     await PageFonts.ensure(_state.lastPage);
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/arabic.dart';
 import '../../core/theme.dart';
+import '../widgets/ornament.dart';
 import '../../data/models.dart';
 import '../../data/page_fonts.dart';
 import '../../data/quran_repository.dart';
@@ -85,7 +86,19 @@ class _MushafScreenState extends State<MushafScreen> {
 
     return Scaffold(
       backgroundColor: c.bg,
-      body: SafeArea(
+      body: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 170,
+            child: OrnamentFill(
+              color: AppColorsScope.of(context).gold.withValues(alpha: 0.2),
+              fade: 1,
+            ),
+          ),
+          SafeArea(
         child: Column(
           children: [
             // ------------------------------------------------ الشريط العلوي
@@ -212,6 +225,8 @@ class _MushafScreenState extends State<MushafScreen> {
           ],
         ),
       ),
+          ],
+        ),
     );
   }
 }

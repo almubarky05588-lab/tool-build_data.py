@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/arabic.dart';
 import '../core/theme.dart';
+import 'widgets/ornament.dart';
 import '../data/models.dart';
 import '../data/quran_repository.dart';
 import 'mushaf/mutashabih_sheet.dart';
@@ -32,7 +33,19 @@ class _MutashabihatScreenState extends State<MutashabihatScreen> {
   Widget build(BuildContext context) {
     final c = AppColorsScope.of(context);
     final groups = _filtered();
-    return SafeArea(
+    return Stack(
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          height: 200,
+          child: OrnamentFill(
+            color: AppColorsScope.of(context).gold.withValues(alpha: 0.2),
+            fade: 1,
+          ),
+        ),
+        SafeArea(
       child: Column(
         children: [
           Padding(
@@ -87,6 +100,8 @@ class _MutashabihatScreenState extends State<MutashabihatScreen> {
           ),
         ],
       ),
+        ),
+      ],
     );
   }
 }

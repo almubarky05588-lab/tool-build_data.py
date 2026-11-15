@@ -8,7 +8,7 @@
 ```bash
 pip install fonttools
 python3 tool/build_data.py     # يجلب المصادر ويولّد assets/ ويتحقق منها
-flutter create . --platforms=android,ios --org sa.albayan --project-name albayan
+flutter create . --platforms=android,ios --org sa.almubarky --project-name albayan
 flutter run
 ```
 

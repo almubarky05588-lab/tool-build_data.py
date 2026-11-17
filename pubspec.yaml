@@ -30,6 +30,9 @@ flutter:
   assets:
     - assets/quran/
     - assets/fonts/qcf2/
+    # زخارف مصحف المدينة من الطبعة الرسمية (tool/extract_mushaf_art.py)
+    - assets/mushaf/
+    - assets/mushaf/surah/
 
   # خطوط الواجهة (رخصة OFL) — يجلبها السكربت نفسه من google/fonts
   fonts:

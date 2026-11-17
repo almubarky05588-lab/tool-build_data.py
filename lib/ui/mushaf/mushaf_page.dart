@@ -8,6 +8,7 @@ import '../../data/models.dart';
 import '../../data/page_fonts.dart';
 import '../../data/quran_repository.dart';
 import '../../state/app_state.dart';
+import 'mushaf_frame.dart';
 
 /// عرض صفحة واحدة من المصحف بأسطرها الخمسة عشر كما في المطبوع،
 /// مع تلوين مواضع التشابه أو علاماتها في الهامش.
@@ -101,12 +102,22 @@ class _PageBody extends StatelessWidget {
     final fs = math.min(textW / 17.4, lineH / 1.5);
     final family = PageFonts.family(page.number);
     final shortPage = page.number <= 2;
+    final framed = MushafFrame.enabled(state);
 
     final rows = <Widget>[];
     for (final line in page.lines) {
       Widget content;
       switch (line.type) {
         case LineType.header:
+          if (framed && MushafFrame.hasBanner(line.surah)) {
+            // ترويسة السورة من الطبعة الرسمية بعرض السطر كاملًا
+            rows.add(SizedBox(
+              height: lineH,
+              width: width,
+              child: Image.asset(MushafFrame.banner(line.surah), fit: BoxFit.fill),
+            ));
+            continue;
+          }
           content = _SurahHeader(name: repo.surah(line.surah).name, height: lineH, fs: fs);
         case LineType.basmala:
           content = Center(
@@ -134,6 +145,7 @@ class _PageBody extends StatelessWidget {
             width: textW,
             centered: shortPage,
             showColor: showColor,
+            markerColor: framed ? MushafFrame.markerColor : null,
             diffOnly: state.diffOnly,
             focusAyah: state.focusAyah,
             onWordTap: onWordTap,
@@ -180,6 +192,7 @@ class _TextLine extends StatelessWidget {
   final double width;
   final bool centered;
   final bool showColor;
+  final Color? markerColor;
   final bool diffOnly;
   final String? focusAyah;
   final void Function(QWord) onWordTap;
@@ -192,6 +205,7 @@ class _TextLine extends StatelessWidget {
     required this.width,
     required this.centered,
     required this.showColor,
+    this.markerColor,
     required this.diffOnly,
     required this.focusAyah,
     required this.onWordTap,
@@ -216,7 +230,7 @@ class _TextLine extends StatelessWidget {
       final span = TextSpan(children: [
         if (w.glyph.isNotEmpty)
           TextSpan(text: w.glyph, style: gid == null ? null : TextStyle(color: c.group(gid))),
-        if (w.marker.isNotEmpty) TextSpan(text: w.marker, style: TextStyle(color: c.gold)),
+        if (w.marker.isNotEmpty) TextSpan(text: w.marker, style: TextStyle(color: markerColor ?? c.gold)),
       ]);
       final tp = TextPainter(
         text: TextSpan(style: base, children: [span]),

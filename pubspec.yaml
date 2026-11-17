@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   # حفظ آخر صفحة والإعدادات والعلامات على الجهاز
   shared_preferences: ^2.3.2
+  # فتح صفحة التقييم في المتجر
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

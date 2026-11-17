@@ -8,6 +8,7 @@
 import json
 import os
 import sys
+from pathlib import Path
 import time
 import urllib.error
 import urllib.parse
@@ -60,7 +61,11 @@ def main() -> None:
         print("   أنشئه مرة واحدة من: https://appstoreconnect.apple.com/apps")
         print(f"   (+) تطبيق جديد ← iOS ← Bundle ID: {bid} ← اللغة: العربية")
         sys.exit(2)
-    print(f"✅ سجل التطبيق موجود: {apps[0]['attributes']['name']}")
+    print(f"✅ سجل التطبيق موجود: {apps[0]['attributes']['name']} (رقمه {apps[0]['id']})")
+    # رقم التطبيق في المتجر لزر «ادعمنا بتقييمك»
+    out = Path(__file__).resolve().parent.parent / "build" / "app_store_id.txt"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(apps[0]["id"])
 
 
 if __name__ == "__main__":

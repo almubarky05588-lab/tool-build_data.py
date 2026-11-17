@@ -99,7 +99,9 @@ pset ITSAppUsesNonExemptEncryption bool false
 
 BUILD=$(( 100 + ${GITHUB_RUN_NUMBER:-1} ))
 step "بناء Flutter (رقم البناء $BUILD)"
-flutter build ios --release --no-codesign --build-number=$BUILD
+APP_STORE_ID=$(cat build/app_store_id.txt 2>/dev/null || true)
+echo "رقم التطبيق في المتجر: ${APP_STORE_ID:-غير معروف}"
+flutter build ios --release --no-codesign --build-number=$BUILD --dart-define=APP_STORE_ID=$APP_STORE_ID
 
 step "الأرشفة (بدون توقيع — التوقيع وقت التصدير)"
 xcodebuild -quiet \

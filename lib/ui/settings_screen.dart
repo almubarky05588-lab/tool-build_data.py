@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/theme.dart';
 import 'widgets/ornament.dart';
@@ -104,30 +105,75 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 22),
-          Text('عن التطبيق', style: cairo(15, weight: FontWeight.w700, color: c.ink)),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: c.paper,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: c.line),
-            ),
-            child: Text(
-              'نص المصحف معروض بخطوط مجمع الملك فهد لطباعة المصحف الشريف (QCF V2) '
-              'على تخطيط مصحف المدينة سطرًا بسطر.\n\n'
-              'بيانات المتشابهات مبنية على عمل القارئ إدريس العاصم رحمه الله '
-              '(مشروع Quran Mutashabihat Data، رخصة CC0)، وهي تركّز على ما يُشكل على '
-              'الحفّاظ وليست حصرًا لكل المتشابهات. كلمات الاختلاف محددة آليًا بمقارنة الآيات.\n\n'
-              'تطبيق مجاني — نسأل الله أن يجعله خالصًا لوجهه.',
-              style: cairo(12.5, color: c.sub, height: 1.7),
-            ),
-          ),
+          if (_RateCard.storeId.isNotEmpty) ...[
+            const SizedBox(height: 22),
+            const _RateCard(),
+          ],
         ],
       ),
         ),
       ],
+    );
+  }
+}
+
+
+/// «ادعمنا بتقييمك على المتجر» — يفتح صفحة كتابة التقييم في App Store.
+class _RateCard extends StatelessWidget {
+  const _RateCard();
+
+  /// رقم التطبيق في المتجر، يُمرَّر وقت البناء: --dart-define=APP_STORE_ID=...
+  static const storeId = String.fromEnvironment('APP_STORE_ID');
+
+  Future<void> _open() async {
+    final uri = Uri.parse('https://apps.apple.com/app/id$storeId?action=write-review');
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColorsScope.of(context);
+    return Material(
+      color: c.paper,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _open,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: c.gold.withValues(alpha: 0.6)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: c.gold.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.star_rounded, color: c.gold, size: 26),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('ادعمنا بتقييمك على المتجر',
+                        style: cairo(15, weight: FontWeight.w700, color: c.ink)),
+                    const SizedBox(height: 2),
+                    Text('تقييمك يساعد غيرك من الحفّاظ يصل للتطبيق',
+                        style: cairo(12.5, color: c.sub)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_left_rounded, color: c.sub),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

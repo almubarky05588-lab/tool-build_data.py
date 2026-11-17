@@ -10,7 +10,7 @@ import json
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 GOLD = (217, 182, 106)
@@ -68,8 +68,13 @@ def draw_icon(size: int = 1024) -> Image.Image:
     arc = [P(*q) for q in quad((53, 70), (60, 61), (67, 70))]
     for i in range(0, len(arc) - 2, 6):
         d.line(arc[i:i + 3], fill=HI, width=int(1.8 * k))
-    star = [(60, 14), (63, 21), (70, 24), (63, 27), (60, 34), (57, 27), (50, 24), (57, 21)]
-    d.polygon([P(*q) for q in star], fill=HI)
+    # كلمة «البيان» فوق المصحف (مكان النجمة سابقًا)
+    font = ImageFont.truetype(str(ROOT / "assets" / "fonts" / "ui" / "ArefRuqaa-Bold.ttf"),
+                              int(26 * k), layout_engine=ImageFont.Layout.RAQM)
+    word = "البيان"
+    x0, y0, x1, y1 = d.textbbox((0, 0), word, font=font, direction="rtl")
+    cx, cy = P(60, 22)
+    d.text((cx - (x0 + x1) / 2, cy - (y0 + y1) / 2), word, font=font, fill=HI, direction="rtl")
     return img.resize((size, size), Image.LANCZOS)
 
 

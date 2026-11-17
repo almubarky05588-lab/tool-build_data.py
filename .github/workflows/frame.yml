@@ -1,0 +1,46 @@
+# تنزيل ملفات مصحف المدينة الرسمية (مجمع الملك فهد) لاقتطاع الإطار والزخارف.
+# يُشغَّل يدويًا. النتائج تُرفع إلى فرع frame.
+name: frame
+on:
+  workflow_dispatch:
+    inputs:
+      files:
+        description: "أسماء ملفات من الأرشيف للتنزيل (مفصولة بفاصلة)، فارغ = القائمة فقط"
+        required: false
+        default: ""
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: القائمة والتنزيل
+        env:
+          FILES: ${{ inputs.files }}
+        run: |
+          mkdir -p out
+          ID=MushafMadinaHafsGreen1441
+          curl -sL "https://archive.org/metadata/$ID" -o out/metadata.json
+          python3 - <<'PY'
+          import json
+          m=json.load(open('out/metadata.json'))
+          with open('out/files.txt','w') as f:
+              for x in m.get('files',[]):
+                  f.write(f"{x.get('name')}\t{x.get('size','')}\t{x.get('format','')}\n")
+          PY
+          IFS=',' read -ra FS <<< "$FILES"
+          for f in "${FS[@]}"; do
+            [ -z "$f" ] && continue
+            enc=$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1]))" "$f")
+            curl -sL --fail "https://archive.org/download/$ID/$enc" -o "out/$(basename "$f")" || echo "فشل: $f"
+          done
+          ls -la out
+      - name: رفع إلى فرع frame
+        run: |
+          cd out
+          git init -q -b frame
+          git config user.name "ci" && git config user.email "ci@users.noreply.github.com"
+          find . -size +95M -delete
+          git add -A && git commit -qm "frame files"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" frame

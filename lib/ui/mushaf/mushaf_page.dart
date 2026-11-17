@@ -114,7 +114,7 @@ class _PageBody extends StatelessWidget {
             rows.add(SizedBox(
               height: lineH,
               width: width,
-              child: Image.asset(MushafFrame.banner(line.surah), fit: BoxFit.fill),
+              child: MushafFrame.art(MushafFrame.banner(line.surah), dark: state.dark),
             ));
             continue;
           }
@@ -145,7 +145,7 @@ class _PageBody extends StatelessWidget {
             width: textW,
             centered: shortPage,
             showColor: showColor,
-            markerColor: framed ? MushafFrame.markerColor : null,
+            markerColor: framed && !state.dark ? MushafFrame.markerColor : null,
             diffOnly: state.diffOnly,
             focusAyah: state.focusAyah,
             onWordTap: onWordTap,

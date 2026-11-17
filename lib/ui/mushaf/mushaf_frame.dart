@@ -22,8 +22,21 @@ class MushafFrame {
   /// لون دوائر أرقام الآيات داخل الإطار.
   static const markerColor = Color(0xFF2E7D4F);
 
-  /// الإطار في الوضع النهاري؛ الليلي يبقى بالتصميم الداكن.
-  static bool enabled(AppState state) => !state.dark;
+  /// الإطار في الوضعين؛ في الليلي يُخفَّف سطوعه ويصير داخل الصفحة داكنًا.
+  static bool enabled(AppState state) => true;
+
+  /// تخفيف سطوع الزخارف في الوضع الليلي.
+  static const dimDark = ColorFilter.matrix(<double>[
+    0.62, 0, 0, 0, 0, //
+    0, 0.62, 0, 0, 0, //
+    0, 0, 0.62, 0, 0, //
+    0, 0, 0, 1, 0, //
+  ]);
+
+  static Widget art(String asset, {required bool dark}) {
+    final img = Image.asset(asset, fit: BoxFit.fill);
+    return dark ? ColorFiltered(colorFilter: dimDark, child: img) : img;
+  }
 
   /// الفاتحة وأول البقرة بتخطيط خاص في المطبوع، فلا ترويسة مقتطعة لهما.
   static bool hasBanner(int surah) => surah >= 3 && surah <= 114;
@@ -39,6 +52,8 @@ class FramedPage extends StatelessWidget {
   final String pageNumber;
   final Widget child;
   final TextStyle labelStyle;
+  final bool dark;
+  final Color darkPaper;
 
   const FramedPage({
     super.key,
@@ -47,6 +62,8 @@ class FramedPage extends StatelessWidget {
     required this.pageNumber,
     required this.child,
     required this.labelStyle,
+    this.dark = false,
+    this.darkPaper = const Color(0xFF1A201D),
   });
 
   @override
@@ -93,11 +110,11 @@ class FramedPage extends StatelessWidget {
                       top: r[1] * fh,
                       right: (1 - r[2]) * fw,
                       bottom: (1 - r[3]) * fh,
-                      child: const ColoredBox(color: Colors.white),
+                      child: ColoredBox(color: dark ? darkPaper : Colors.white),
                     ),
                     Positioned.fill(
                       child: IgnorePointer(
-                        child: Image.asset(MushafFrame.asset, fit: BoxFit.fill),
+                        child: MushafFrame.art(MushafFrame.asset, dark: dark),
                       ),
                     ),
                     Positioned(

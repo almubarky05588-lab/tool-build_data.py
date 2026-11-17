@@ -244,7 +244,8 @@ class _PageFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsScope.of(context);
     final repo = QuranRepository.instance;
-    if (MushafFrame.enabled(AppScope.of(context))) {
+    final st = AppScope.of(context);
+    if (MushafFrame.enabled(st)) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
         child: FramedPage(
@@ -252,6 +253,7 @@ class _PageFrame extends StatelessWidget {
           surah: 'سورة ${repo.surahForPage(pageNo).name}',
           pageNumber: ar(pageNo),
           labelStyle: cairo(12.5, weight: FontWeight.w600, color: c.greenText),
+          dark: st.dark,
           child: MushafPage(
             pageNo: pageNo,
             onWordTap: onWordTap,

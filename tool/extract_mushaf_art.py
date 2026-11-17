@@ -48,7 +48,11 @@ def geometry(img: Image.Image):
     rows = clusters(np.where(dark.mean(1) > 0.4)[0])
     if len(cols) < 4 or len(rows) < 4:
         raise RuntimeError(f"تعذّر تحديد الإطار: cols={cols} rows={rows}")
-    inner = (cols[1][1] + 1, rows[1][1] + 1, cols[-2][0] - 1, rows[-2][0] - 1)
+    # سماكة الخطين المزدوجين من الأعلى/اليسار، ونطبّقها على الأسفل/اليمين
+    # (قد يلتصق شريط ترويسة سورة بالخط السفلي فلا نعتمد على ثاني خط من الأسفل)
+    tx = cols[1][1] - cols[0][0]
+    ty = rows[1][1] - rows[0][0]
+    inner = (cols[1][1] + 1, rows[1][1] + 1, cols[-1][1] - tx - 1, rows[-1][1] - ty - 1)
     br = np.where(nonwhite.mean(1) > 0.5)[0]
     bc = np.where(nonwhite.mean(0) > 0.5)[0]
     band = (int(bc[0]), int(br[0]), int(bc[-1]) + 1, int(br[-1]) + 1)

@@ -35,12 +35,18 @@ def call(method: str, path: str, body=None):
         data=json.dumps(body).encode() if body else None,
         headers={"Authorization": f"Bearer {token()}", "Content-Type": "application/json"},
     )
-    try:
-        with urllib.request.urlopen(req) as r:
-            return json.load(r)
-    except urllib.error.HTTPError as e:
-        print(f"❌ {method} {path} → {e.code}\n{e.read().decode()[:800]}")
-        sys.exit(1)
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(req) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            # أخطاء خوادم Apple المؤقتة (5xx): نعيد المحاولة
+            if e.code >= 500 and attempt < 4:
+                print(f"⚠️ {method} {path} → {e.code}، إعادة المحاولة…")
+                time.sleep(10 * (attempt + 1))
+                continue
+            print(f"❌ {method} {path} → {e.code}\n{e.read().decode()[:800]}")
+            sys.exit(1)
 
 
 def main() -> None:

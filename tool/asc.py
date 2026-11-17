@@ -29,7 +29,7 @@ def token() -> str:
     )
 
 
-def call(method: str, path: str, body=None):
+def call(method: str, path: str, body=None, fatal: bool = True):
     req = urllib.request.Request(
         API + path, method=method,
         data=json.dumps(body).encode() if body else None,
@@ -46,6 +46,8 @@ def call(method: str, path: str, body=None):
                 time.sleep(10 * (attempt + 1))
                 continue
             print(f"❌ {method} {path} → {e.code}\n{e.read().decode()[:800]}")
+            if not fatal:
+                raise RuntimeError(e.code) from e
             sys.exit(1)
 
 
@@ -62,8 +64,13 @@ def main() -> None:
         print(f"✅ سُجّل معرّف التطبيق الآن: {bid}")
 
     # الفلترة بالمعرّف تعطي أحيانًا خطأ 500 من Apple، فنجلب القائمة ونفلتر هنا
-    apps = [a for a in call("GET", "/apps?limit=200")["data"]
-            if a["attributes"].get("bundleId") == bid]
+    try:
+        apps = [a for a in call("GET", "/apps?limit=200", fatal=False)["data"]
+                if a["attributes"].get("bundleId") == bid]
+    except RuntimeError:
+        # خوادم Apple لا تجيب على قائمة التطبيقات؛ السجل موجود من قبل فنكمل الرفع
+        print("⚠️ تعذّر جلب سجل التطبيق من Apple — نكمل بدون رقم التطبيق (يُخفى زر التقييم)")
+        return
     if not apps:
         print("❌ APP_RECORD_MISSING — سجل التطبيق غير موجود في App Store Connect.")
         print("   أنشئه مرة واحدة من: https://appstoreconnect.apple.com/apps")

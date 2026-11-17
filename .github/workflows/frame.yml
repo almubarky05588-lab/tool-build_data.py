@@ -105,7 +105,7 @@ jobs:
           python3 -m pip install -q numpy pillow
           curl -sL --fail "https://archive.org/download/MushafMadinaHafsGreen1441/MushafMadinaHafsGreen1441HQ.pdf" -o /tmp/hq.pdf
           mkdir -p /tmp/pages
-          PAGES=$(python3 -c "import json;h=json.load(open('tool/surah_headers.json'));print(' '.join(str(p+3) for p in sorted({x['p'] for x in h if x['n']==15}|{50})))")
+          PAGES=$(python3 -c "import json;h=json.load(open('tool/surah_headers.json'));print(' '.join(str(p+3) for p in sorted({x['p']+(1 if x['i']==14 else 0) for x in h if x['n']==15}|{50})))")
           for n in $PAGES; do pdftoppm -f $n -l $n -r 110 -png /tmp/hq.pdf /tmp/pages/p$n; done
           python3 tool/extract_mushaf_art.py /tmp/pages out/art
           du -sh out/art

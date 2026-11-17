@@ -113,12 +113,14 @@ def make_banners(src: Path, out: Path) -> list[Path]:
     for hd in heads:
         if hd["n"] != 15:
             continue  # الفاتحة وأول البقرة بتخطيط خاص
-        img = page_img(src, hd["p"])
+        # في طبعة ١٤٤١هـ تنتقل ترويسة السورة التي في آخر سطر إلى أول الصفحة التالية
+        last = hd["i"] == 14
+        img = page_img(src, hd["p"] + 1 if last else hd["p"])
         _, (ix0, iy0, ix1, iy1) = geometry(img)
         ih = iy1 - iy0
         pad = 0.0091 * ih
         slot = (ih - 2 * pad) / 15
-        expect = iy0 + pad + hd["i"] * slot
+        expect = iy0 + pad + (0 if last else hd["i"]) * slot
         # الترويسة شريط أخضر: نبحث عن أقرب شريط أخضر بارتفاع سطر تقريبًا للموضع المتوقع
         a = np.asarray(img.crop((ix0, iy0, ix1, iy1))).astype(int)
         green = (a[:, :, 1] > a[:, :, 0] + 12) & (a[:, :, 1] > a[:, :, 2] + 8)

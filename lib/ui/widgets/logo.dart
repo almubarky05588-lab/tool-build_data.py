@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// علامة «البيان»: مصحف مفتوح يتطابق فيه سطران مضيئان، وفوقهما نجمة.
+/// علامة «البيان»: مصحف مفتوح يتطابق فيه سطران مضيئان، وفوقهما كلمة «البيان».
 /// منقولة من تصميم الشعار في فيجما (مساحة رسم 120×120).
 class BayanMark extends StatelessWidget {
   final double size;
@@ -89,18 +89,16 @@ class _MarkPainter extends CustomPainter {
       }
     }
 
-    // النجمة
-    final star = Path()
-      ..moveTo(60, 14)
-      ..lineTo(63, 21)
-      ..lineTo(70, 24)
-      ..lineTo(63, 27)
-      ..lineTo(60, 34)
-      ..lineTo(57, 27)
-      ..lineTo(50, 24)
-      ..lineTo(57, 21)
-      ..close();
-    canvas.drawPath(star, Paint()..color = hi);
+    // كلمة «البيان» فوق المصحف
+    final tp = TextPainter(
+      text: TextSpan(
+        text: 'البيان',
+        style: TextStyle(fontFamily: 'ArefRuqaa', fontSize: 26, color: hi, height: 1.2),
+      ),
+      textDirection: TextDirection.rtl,
+    )..layout();
+    tp.paint(canvas, Offset(60 - tp.width / 2, 22 - tp.height / 2));
+    tp.dispose();
   }
 
   @override

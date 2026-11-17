@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('السلام عليكم', style: cairo(13, color: c.sub)),
+                  Text('مصحف المتشابهات', style: cairo(13, color: c.sub)),
                   Text('البيان',
                       style: TextStyle(
                         fontFamily: 'ArefRuqaa',

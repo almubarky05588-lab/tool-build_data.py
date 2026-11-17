@@ -6,6 +6,7 @@ import '../../core/arabic.dart';
 import '../../core/theme.dart';
 import '../widgets/ornament.dart';
 import 'curl_view.dart';
+import 'mushaf_frame.dart';
 import '../../data/models.dart';
 import '../../data/page_fonts.dart';
 import '../../data/quran_repository.dart';
@@ -243,6 +244,22 @@ class _PageFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsScope.of(context);
     final repo = QuranRepository.instance;
+    if (MushafFrame.enabled(AppScope.of(context))) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: FramedPage(
+          juz: juzName(repo.juzForPage(pageNo)),
+          surah: 'سورة ${repo.surahForPage(pageNo).name}',
+          pageNumber: ar(pageNo),
+          labelStyle: cairo(12.5, weight: FontWeight.w600, color: c.greenText),
+          child: MushafPage(
+            pageNo: pageNo,
+            onWordTap: onWordTap,
+            onMarkerTap: onMarkerTap,
+          ),
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Container(

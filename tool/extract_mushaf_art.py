@@ -114,14 +114,31 @@ def make_banners(src: Path, out: Path) -> list[Path]:
         ih = iy1 - iy0
         pad = 0.0091 * ih
         slot = (ih - 2 * pad) / 15
-        top = iy0 + pad + hd["i"] * slot
-        box = (ix0 + 4, round(top), ix1 - 4, round(top + slot))
-        b = img.crop(box)
+        expect = iy0 + pad + hd["i"] * slot
+        # الترويسة شريط أخضر: نبحث عن أقرب شريط أخضر بارتفاع سطر تقريبًا للموضع المتوقع
+        a = np.asarray(img.crop((ix0, iy0, ix1, iy1))).astype(int)
+        green = (a[:, :, 1] > a[:, :, 0] + 12) & (a[:, :, 1] > a[:, :, 2] + 8)
+        frac = green.mean(1)
+        bands, st = [], None
+        for y, v in enumerate(frac > 0.35):
+            if v and st is None:
+                st = y
+            if (not v or y == len(frac) - 1) and st is not None:
+                if y - st > slot * 0.5:
+                    bands.append((st + iy0, y + iy0))
+                st = None
+        if not bands:
+            print(f"⚠️ لا شريط أخضر لسورة {hd['s']} (صفحة {hd['p']})")
+            continue
+        top, bot = min(bands, key=lambda b: abs(b[0] - expect))
+        if abs(top - expect) > slot * 1.6:
+            print(f"⚠️ الشريط بعيد عن المتوقع لسورة {hd['s']}")
+        m = round(slot * 0.04)  # إطار الشريط الداكن فوقه وتحته
+        b = img.crop((ix0 + 2, top - m, ix1 - 2, bot + m))
         g = np.asarray(b.convert("L"))
         cols = np.where((g < 200).mean(0) > 0.15)[0]
-        rows = np.where((g < 200).mean(1) > 0.15)[0]
-        if len(cols) and len(rows):
-            b = b.crop((int(cols[0]), int(rows[0]), int(cols[-1]) + 1, int(rows[-1]) + 1))
+        if len(cols):
+            b = b.crop((int(cols[0]), 0, int(cols[-1]) + 1, b.height))
         b = b.resize((BANNER_W, round(b.height * BANNER_W / b.width)), Image.LANCZOS)
         p = out / "surah" / f"{hd['s']:03d}.png"
         quantize(b).save(p, optimize=True)

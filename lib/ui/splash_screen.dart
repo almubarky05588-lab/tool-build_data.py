@@ -55,6 +55,7 @@ class SplashScreen extends StatelessWidget {
                   height: 1.3,
                 ),
               ),
+              const SizedBox(height: 14),
               Text('مصحف المتشابهات',
                   style: cairo(20, weight: FontWeight.w600, color: Colors.white)),
               const Spacer(flex: 4),

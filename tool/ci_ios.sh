@@ -100,6 +100,7 @@ pset ITSAppUsesNonExemptEncryption bool false
 BUILD=$(( 100 + ${GITHUB_RUN_NUMBER:-1} ))
 step "بناء Flutter (رقم البناء $BUILD)"
 APP_STORE_ID=$(cat build/app_store_id.txt 2>/dev/null || true)
+APP_STORE_ID=${APP_STORE_ID:-6835200705}  # رقم «البيان» في المتجر
 echo "رقم التطبيق في المتجر: ${APP_STORE_ID:-غير معروف}"
 flutter build ios --release --no-codesign --build-number=$BUILD --dart-define=APP_STORE_ID=$APP_STORE_ID
 
@@ -133,19 +134,37 @@ cat > build/ExportOptions.plist <<PLIST
 </dict>
 </plist>
 PLIST
-# خوادم Apple تتعثر أحيانًا ("Error Downloading App Information")؛ نعيد المحاولة
+# خوادم Apple تتعثر أحيانًا ("Error Downloading App Information" — خطأ 500 في /v1/apps)
 ok=0
-for attempt in 1 2 3 4; do
+for attempt in 1 2; do
   if xcodebuild -exportArchive \
       -archivePath build/Runner.xcarchive \
       -exportOptionsPlist build/ExportOptions.plist \
       -exportPath build/export \
       "${AUTH[@]}"; then ok=1; break; fi
-  echo "⚠️ محاولة الرفع $attempt فشلت — تفاصيل سجل التوزيع:"
+  echo "⚠️ محاولة الرفع $attempt فشلت"
   L=$(ls -td "${TMPDIR:-/tmp}"/*.xcdistributionlogs 2>/dev/null | head -1)
-  [ -n "$L" ] && grep -hiE "error|fail|status|http" "$L"/*.log 2>/dev/null | tail -25
-  sleep $((attempt * 60))
+  [ -n "$L" ] && grep -hiE "status code|Step failed" "$L"/*.log 2>/dev/null | tail -4 | cut -c1-300
+  sleep 60
 done
+
+if [ "$ok" != 1 ]; then
+  step "طريق بديل: تصدير IPA ثم رفعه برقم التطبيق مباشرة"
+  sed -e 's#<string>upload</string>#<string>export</string>#' build/ExportOptions.plist > build/ExportOptionsIPA.plist
+  xcodebuild -exportArchive \
+    -archivePath build/Runner.xcarchive \
+    -exportOptionsPlist build/ExportOptionsIPA.plist \
+    -exportPath build/ipa \
+    "${AUTH[@]}" || { echo "❌ تعذّر تصدير IPA"; exit 70; }
+  IPA=$(ls build/ipa/*.ipa | head -1)
+  for attempt in 1 2 3; do
+    if xcrun altool --upload-package "$IPA" --type ios \
+        --apple-id "$APP_STORE_ID" --bundle-id "$BUNDLE_ID" \
+        --bundle-version "$BUILD" --bundle-short-version-string "1.0.0" \
+        --apiKey "$KEY_ID" --apiIssuer "$ISSUER"; then ok=1; break; fi
+    echo "⚠️ محاولة altool $attempt فشلت"; sleep 60
+  done
+fi
 [ "$ok" = 1 ] || { echo "❌ فشل الرفع بعد عدة محاولات"; exit 70; }
 
 step "✅ اكتمل — النسخة $BUILD مرفوعة إلى TestFlight (تظهر خلال ١٠–٢٠ دقيقة)"

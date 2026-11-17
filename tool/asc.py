@@ -61,7 +61,9 @@ def main() -> None:
             "identifier": bid, "name": "Albayan", "platform": "IOS"}}})
         print(f"✅ سُجّل معرّف التطبيق الآن: {bid}")
 
-    apps = call("GET", f"/apps?filter[bundleId]={q}")["data"]
+    # الفلترة بالمعرّف تعطي أحيانًا خطأ 500 من Apple، فنجلب القائمة ونفلتر هنا
+    apps = [a for a in call("GET", "/apps?limit=200")["data"]
+            if a["attributes"].get("bundleId") == bid]
     if not apps:
         print("❌ APP_RECORD_MISSING — سجل التطبيق غير موجود في App Store Connect.")
         print("   أنشئه مرة واحدة من: https://appstoreconnect.apple.com/apps")

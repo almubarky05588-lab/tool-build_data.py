@@ -103,7 +103,15 @@ def android(icon: Image.Image) -> None:
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "preview"
-    img = draw_icon()
+    # الأيقونة مرسومة مسبقًا (كلمة «البيان» تحتاج libraqm لتشكيل الحروف،
+    # وقد لا تتوفر في جهاز البناء). لإعادة رسمها: python3 tool/apply_icons.py render
+    pre = ROOT / "assets" / "icon" / "app_icon_1024.png"
+    if target == "render":
+        pre.parent.mkdir(parents=True, exist_ok=True)
+        draw_icon().save(pre)
+        print(f"✓ {pre}")
+        sys.exit(0)
+    img = Image.open(pre).convert("RGB") if pre.exists() else draw_icon()
     if target == "ios":
         ios(img)
     elif target == "android":

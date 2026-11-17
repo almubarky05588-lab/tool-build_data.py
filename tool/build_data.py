@@ -313,29 +313,44 @@ def build_mutashabihat(muts_dir: Path, ayah_words):
                 dy.update(j for j in range(j1, j2) if by0 <= j < by1)
         return dx, dy
 
-    groups, by_ayah = [], {}
+    # المصدر يكرر المجموعة نفسها من منظور كل آية فيها (أ↔ب↔ج)، وأحيانًا
+    # مجموعة جزئية داخل مجموعة أكبر. نُبقي مجموعة واحدة لكل مجموعة مواضع،
+    # ونحذف المجموعة إذا كانت كل مواضعها داخل مجموعة أكبر.
+    cand = []
     for juz in sorted(raw, key=int):
         for g in raw[juz]:
             members = [member(g["src"]["ayah"])] + [member(m["ayah"]) for m in g["muts"]]
-            wl = [words_of(m) for m in members]
-            src_diff, member_diffs = set(), []
-            for other in wl[1:]:
-                dx, dy = diff(wl[0], other)
-                src_diff |= dx
-                member_diffs.append(sorted(dy))
-            diffs = [sorted(src_diff)] + member_diffs
-            gid = len(groups)
-            groups.append({
-                "m": [[f"{s}:{a}" for s, a in m] for m in members],
-                "d": [[f"{wl[k][j][0]}:{wl[k][j][1]}:{wl[k][j][2]}" for j in diffs[k]]
-                      for k in range(len(members))],
-                "c": g.get("ctx", 0),
-            })
-            for m in members:
-                for s, a in m:
-                    lst = by_ayah.setdefault(f"{s}:{a}", [])
-                    if gid not in lst:
-                        lst.append(gid)
+            key = frozenset(tuple(m) for m in members)
+            cand.append((key, members, g))
+    keep, seen = [], set()
+    for key, members, g in cand:
+        if key in seen or any(key < other for other, _, _ in cand):
+            continue
+        seen.add(key)
+        keep.append((members, g))
+    log(f"  حذف التكرار: {len(cand)} → {len(keep)} مجموعة")
+
+    groups, by_ayah = [], {}
+    for members, g in keep:
+        wl = [words_of(m) for m in members]
+        src_diff, member_diffs = set(), []
+        for other in wl[1:]:
+            dx, dy = diff(wl[0], other)
+            src_diff |= dx
+            member_diffs.append(sorted(dy))
+        diffs = [sorted(src_diff)] + member_diffs
+        gid = len(groups)
+        groups.append({
+            "m": [[f"{s}:{a}" for s, a in m] for m in members],
+            "d": [[f"{wl[k][j][0]}:{wl[k][j][1]}:{wl[k][j][2]}" for j in diffs[k]]
+                  for k in range(len(members))],
+            "c": g.get("ctx", 0),
+        })
+        for m in members:
+            for s, a in m:
+                lst = by_ayah.setdefault(f"{s}:{a}", [])
+                if gid not in lst:
+                    lst.append(gid)
     log(f"✓ المتشابهات: {len(groups)} مجموعة، تشمل {len(by_ayah)} آية")
     return {"groups": groups, "byAyah": by_ayah}
 

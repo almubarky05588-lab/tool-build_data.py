@@ -57,7 +57,7 @@ jobs:
           for n in names:
               base = os.path.basename(n)
               nums = [int(x) for x in re.findall(r'\d+', base)]
-              if base and nums and nums[-1] in want:
+              if base and nums and nums[0] in want:
                   data = z.read(n)
                   dest = 'out/ai/' + base
                   open(dest, 'wb').write(data)

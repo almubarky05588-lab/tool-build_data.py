@@ -16,6 +16,14 @@ on:
         description: "أرقام صفحات PDF تُرسم صورًا"
         required: false
         default: ""
+      pdf_name:
+        description: "ملف PDF"
+        required: false
+        default: "MushafMadinaHafsGreen1441.pdf"
+      dpi:
+        description: "الدقة"
+        required: false
+        default: "90"
 permissions:
   contents: write
 jobs:
@@ -80,11 +88,11 @@ jobs:
           PAGES: ${{ inputs.pdf_pages }}
         run: |
           sudo apt-get install -y -qq poppler-utils >/dev/null
-          curl -sL --fail "https://archive.org/download/MushafMadinaHafsGreen1441/MushafMadinaHafsGreen1441.pdf" -o /tmp/m.pdf
+          curl -sL --fail "https://archive.org/download/MushafMadinaHafsGreen1441/${{ inputs.pdf_name }}" -o /tmp/m.pdf
           pdfinfo /tmp/m.pdf | tee out/pdfinfo.txt
           mkdir -p out/pdf
           IFS=',' read -ra PS <<< "$PAGES"
-          for n in "${PS[@]}"; do pdftoppm -f "$n" -l "$n" -r 90 -png /tmp/m.pdf "out/pdf/p$n"; done
+          for n in "${PS[@]}"; do pdftoppm -f "$n" -l "$n" -r ${{ inputs.dpi }} -png /tmp/m.pdf "out/pdf/p$n"; done
           ls -la out/pdf
       - name: رفع إلى فرع frame
         run: |

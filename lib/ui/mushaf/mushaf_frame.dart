@@ -80,6 +80,8 @@ class FramedPage extends StatelessWidget {
       final r = MushafFrame.inner;
       final innerH = (r[3] - r[1]) * fh;
       final padV = innerH * MushafFrame.pad;
+      // فراغ أبيض بين النص وخط الإطار الداخلي كما في المطبوع
+      final padH = fw * 0.03;
       return Center(
         child: SizedBox(
           width: fw,
@@ -118,9 +120,9 @@ class FramedPage extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      left: r[0] * fw,
+                      left: r[0] * fw + padH,
                       top: r[1] * fh + padV,
-                      right: (1 - r[2]) * fw,
+                      right: (1 - r[2]) * fw + padH,
                       bottom: (1 - r[3]) * fh + padV,
                       child: child,
                     ),

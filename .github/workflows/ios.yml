@@ -9,7 +9,7 @@ permissions:
 jobs:
   beta:
     name: بناء البيان ورفعه إلى TestFlight
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4

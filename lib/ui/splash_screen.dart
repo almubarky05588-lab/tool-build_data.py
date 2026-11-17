@@ -43,19 +43,8 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 3),
-              const BayanAppIcon(size: 132),
-              const SizedBox(height: 18),
-              const Text(
-                'البيان',
-                style: TextStyle(
-                  fontFamily: 'ArefRuqaa',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 58,
-                  color: Color(0xFFF1DCA6),
-                  height: 1.3,
-                ),
-              ),
-              const SizedBox(height: 14),
+              const BayanAppIcon(size: 160),
+              const SizedBox(height: 28),
               Text('مصحف المتشابهات',
                   style: cairo(20, weight: FontWeight.w600, color: Colors.white)),
               const Spacer(flex: 4),

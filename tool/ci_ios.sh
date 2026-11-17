@@ -133,10 +133,19 @@ cat > build/ExportOptions.plist <<PLIST
 </dict>
 </plist>
 PLIST
-xcodebuild -exportArchive \
-  -archivePath build/Runner.xcarchive \
-  -exportOptionsPlist build/ExportOptions.plist \
-  -exportPath build/export \
-  "${AUTH[@]}"
+# خوادم Apple تتعثر أحيانًا ("Error Downloading App Information")؛ نعيد المحاولة
+ok=0
+for attempt in 1 2 3 4; do
+  if xcodebuild -exportArchive \
+      -archivePath build/Runner.xcarchive \
+      -exportOptionsPlist build/ExportOptions.plist \
+      -exportPath build/export \
+      "${AUTH[@]}"; then ok=1; break; fi
+  echo "⚠️ محاولة الرفع $attempt فشلت — تفاصيل سجل التوزيع:"
+  L=$(ls -td "${TMPDIR:-/tmp}"/*.xcdistributionlogs 2>/dev/null | head -1)
+  [ -n "$L" ] && grep -hiE "error|fail|status|http" "$L"/*.log 2>/dev/null | tail -25
+  sleep $((attempt * 60))
+done
+[ "$ok" = 1 ] || { echo "❌ فشل الرفع بعد عدة محاولات"; exit 70; }
 
 step "✅ اكتمل — النسخة $BUILD مرفوعة إلى TestFlight (تظهر خلال ١٠–٢٠ دقيقة)"

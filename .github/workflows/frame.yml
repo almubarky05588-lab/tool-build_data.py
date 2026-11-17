@@ -8,6 +8,10 @@ on:
         description: "أسماء ملفات من الأرشيف للتنزيل (مفصولة بفاصلة)، فارغ = القائمة فقط"
         required: false
         default: ""
+      ai_pages:
+        description: "أرقام صفحات تُستخرج من ملفات Illustrator (مثل 1,2,50)"
+        required: false
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -36,6 +40,36 @@ jobs:
             curl -sL --fail "https://archive.org/download/$ID/$enc" -o "out/$(basename "$f")" || echo "فشل: $f"
           done
           ls -la out
+      - name: ملفات Illustrator — استخراج صفحات مختارة
+        if: ${{ inputs.ai_pages != '' }}
+        env:
+          PAGES: ${{ inputs.ai_pages }}
+        run: |
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          curl -sL --fail "https://archive.org/download/MushafMadinaHafsGreen1441/1441-AI-hafs.zip" -o /tmp/ai.zip
+          python3 - <<'PY'
+          import os, re, zipfile
+          z = zipfile.ZipFile('/tmp/ai.zip')
+          names = z.namelist()
+          open('out/ai_list.txt', 'w').write('\n'.join(names))
+          want = {int(p) for p in os.environ['PAGES'].split(',') if p.strip()}
+          os.makedirs('out/ai', exist_ok=True)
+          for n in names:
+              base = os.path.basename(n)
+              nums = [int(x) for x in re.findall(r'\d+', base)]
+              if base and nums and nums[-1] in want:
+                  data = z.read(n)
+                  dest = 'out/ai/' + base
+                  open(dest, 'wb').write(data)
+                  print('استُخرج', n, len(data))
+          PY
+          cd out/ai
+          for f in *; do
+            stem="${f%.*}"
+            pdftocairo -png -r 110 -singlefile "$f" "$stem" || echo "تعذّر PNG: $f"
+            pdftocairo -svg "$f" "$stem.svg" || echo "تعذّر SVG: $f"
+          done
+          ls -la
       - name: رفع إلى فرع frame
         run: |
           cd out

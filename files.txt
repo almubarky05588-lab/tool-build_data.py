@@ -1,0 +1,30 @@
+1441-AI-hafs.zip	466430736	ZIP
+MushafMadinaHafsGreen1441.epub	623207	EPUB
+MushafMadinaHafsGreen1441.pdf	65008727	Image Container PDF
+MushafMadinaHafsGreen1441HQ.epub	407461	EPUB
+MushafMadinaHafsGreen1441HQ.pdf	487896486	Image Container PDF
+MushafMadinaHafsGreen1441HQ_chocr.html.gz	2868522	chOCR
+MushafMadinaHafsGreen1441HQ_djvu.txt	251061	DjVuTXT
+MushafMadinaHafsGreen1441HQ_djvu.xml	4463810	Djvu XML
+MushafMadinaHafsGreen1441HQ_hocr.html	10419194	hOCR
+MushafMadinaHafsGreen1441HQ_hocr_pageindex.json.gz	7221	OCR Page Index
+MushafMadinaHafsGreen1441HQ_hocr_searchtext.txt.gz	93960	OCR Search Text
+MushafMadinaHafsGreen1441HQ_jp2.tar	2265702400	Single Page Processed JP2 Tar
+MushafMadinaHafsGreen1441HQ_page_numbers.json	92151	Page Numbers JSON
+MushafMadinaHafsGreen1441HQ_scandata.xml	193408	Scandata
+MushafMadinaHafsGreen1441HQ_text.pdf	378522563	Additional Text PDF
+MushafMadinaHafsGreen1441_archive.torrent	54954	Archive BitTorrent
+MushafMadinaHafsGreen1441_chocr.html.gz	7829058	chOCR
+MushafMadinaHafsGreen1441_djvu.txt	726960	DjVuTXT
+MushafMadinaHafsGreen1441_djvu.xml	13092861	Djvu XML
+MushafMadinaHafsGreen1441_files.xml		Metadata
+MushafMadinaHafsGreen1441_hocr.html	28917366	hOCR
+MushafMadinaHafsGreen1441_hocr_pageindex.json.gz	7501	OCR Page Index
+MushafMadinaHafsGreen1441_hocr_searchtext.txt.gz	262884	OCR Search Text
+MushafMadinaHafsGreen1441_jp2.zip	983294272	Single Page Processed JP2 ZIP
+MushafMadinaHafsGreen1441_meta.sqlite	38912	Metadata
+MushafMadinaHafsGreen1441_meta.xml	5001	Metadata
+MushafMadinaHafsGreen1441_page_numbers.json	92360	Page Numbers JSON
+MushafMadinaHafsGreen1441_scandata.xml	192128	Scandata
+MushafMadinaHafsGreen1441_text.pdf	143269921	Additional Text PDF
+__ia_thumb.jpg	22891	Item Tile

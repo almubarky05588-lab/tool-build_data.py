@@ -12,6 +12,10 @@ on:
         description: "أرقام صفحات تُستخرج من ملفات Illustrator (مثل 1,2,50)"
         required: false
         default: ""
+      pdf_pages:
+        description: "أرقام صفحات PDF تُرسم صورًا"
+        required: false
+        default: ""
 permissions:
   contents: write
 jobs:
@@ -70,6 +74,18 @@ jobs:
             pdftocairo -svg "$f" "$stem.svg" || echo "تعذّر SVG: $f"
           done
           ls -la
+      - name: صفحات من PDF الممسوح
+        if: ${{ inputs.pdf_pages != '' }}
+        env:
+          PAGES: ${{ inputs.pdf_pages }}
+        run: |
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          curl -sL --fail "https://archive.org/download/MushafMadinaHafsGreen1441/MushafMadinaHafsGreen1441.pdf" -o /tmp/m.pdf
+          pdfinfo /tmp/m.pdf | tee out/pdfinfo.txt
+          mkdir -p out/pdf
+          IFS=',' read -ra PS <<< "$PAGES"
+          for n in "${PS[@]}"; do pdftoppm -f "$n" -l "$n" -r 90 -png /tmp/m.pdf "out/pdf/p$n"; done
+          ls -la out/pdf
       - name: رفع إلى فرع frame
         run: |
           cd out

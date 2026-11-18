@@ -64,8 +64,8 @@ AUTH=(-allowProvisioningUpdates
       -authenticationKeyIssuerID "$ISSUER")
 
 step "أدوات بايثون"
-python3 -m pip install -q --break-system-packages fonttools pillow pyjwt cryptography 2>/dev/null \
-  || python3 -m pip install -q fonttools pillow pyjwt cryptography
+python3 -m pip install -q --break-system-packages fonttools skia-pathops pillow pyjwt cryptography 2>/dev/null \
+  || python3 -m pip install -q fonttools skia-pathops pillow pyjwt cryptography
 
 step "حساب Apple: معرّف التطبيق وسجل التطبيق"
 ASC_KEY_PATH="$KEY_PATH" ASC_KEY_ID="$KEY_ID" ASC_ISSUER="$ISSUER" BUNDLE_ID="$BUNDLE_ID" \

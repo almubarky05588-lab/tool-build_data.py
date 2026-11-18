@@ -21,7 +21,7 @@ jobs:
 
       - name: تجهيز بيانات المصحف والمتشابهات
         run: |
-          pip install fonttools
+          pip install fonttools skia-pathops
           python3 tool/build_data.py
 
       - uses: actions/setup-java@v4

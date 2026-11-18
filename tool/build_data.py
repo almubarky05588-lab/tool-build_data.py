@@ -144,9 +144,24 @@ def build_fonts(fonts: Path) -> None:
         ttf = src / f"QCF2{p:03d}.ttf"
         if not ttf.exists():
             fail(f"خط الصفحة {p} غير موجود")
-        shutil.copyfile(ttf, out / f"p{p:03d}.ttf")
-    shutil.copyfile(src / "QCF2BSML.ttf", out / "bsml.ttf")
-    log(f"✓ الخطوط: {TOTAL_PAGES} خط صفحة + خط البسملة")
+        merge_overlaps(ttf, out / f"p{p:03d}.ttf")
+    merge_overlaps(src / "QCF2BSML.ttf", out / "bsml.ttf")
+    log(f"✓ الخطوط: {TOTAL_PAGES} خط صفحة + خط البسملة (بعد دمج الخطوط المتداخلة)")
+
+
+def merge_overlaps(src: Path, dst: Path) -> None:
+    """
+    بعض حروف خطوط المجمع مرسومة بأشكال متداخلة (مثل ذيل النون فوق جسم الكلمة).
+    محرّك الرسم في iOS يرسم مناطق التداخل باهتة (رمادية)، فندمج الأشكال المتداخلة
+    في شكل واحد. الشكل الناتج مطابق بصريًا للأصل (اتحاد هندسي لنفس المنطقة)،
+    ولا يغيّر أي حرف أو موضع.
+    """
+    from fontTools.ttLib import TTFont
+    from fontTools.ttLib.removeOverlaps import removeOverlaps
+
+    font = TTFont(str(src))
+    removeOverlaps(font, removeHinting=True)
+    font.save(str(dst))
 
 
 def build_ui_fonts(ui: Path) -> None:
